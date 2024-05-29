@@ -138,7 +138,10 @@ class ServerlessWebpackPrisma {
   copyPrismaSchemaToFunction({ functionName, cwd, prismaDir }) {
     const targetPrismaDir = join(cwd, 'prisma');
     this.serverless.cli.log(`Copy prisma schema for ${functionName}...`);
-    fse.copySync(prismaDir, targetPrismaDir);
+    const filter = this.getFilterFunction();
+    fse.copySync(prismaDir, targetPrismaDir, {
+      filter
+    });
   }
 
   generateCommand() {
@@ -184,6 +187,15 @@ class ServerlessWebpackPrisma {
 
   getIgnoredFunctionNames() {
     return _.get(this.serverless, 'service.custom.prisma.ignoreFunctions', []);
+  }
+
+  getFilterFunction() {
+    const regexPattern = _.get(this.serverless, 'service.custom.prisma.filterFunction', '');
+    /** @param {string} src source file */
+    return (src) => {
+      if (!regexPattern) return true;
+      return new RegExp(regexPattern).test(src);
+    };
   }
 
   getWebpackOutputPath() {
