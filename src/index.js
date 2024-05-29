@@ -190,7 +190,7 @@ class ServerlessWebpackPrisma {
   }
 
   getFilterFunction() {
-    const regexPattern = _.get(this.serverless, 'service.custom.prisma.filterFunction', '');
+    const regexPattern = _.get(this.serverless, 'service.custom.prisma.fileFilterRegex', '');
     /** @param {string} src source file */
     return (src) => {
       if (!regexPattern) return true;
